@@ -31,6 +31,56 @@ const skipFirst = slice.call(arrayLike, 1);
 ```
 
 This usage is in fact *very common*, particularly among "utility" code, as shown [by studies of large bodies of extant JS code](https://github.com/tc39/proposal-bind-this/issues/12). It's so common that it's probably worthwhile to make easier and more reliable.
+Taking some text directly from the [bind-this proposal](https://github.com/tc39/proposal-bind-this/blob/main/README.md#why-a-bind-this-operator):
+
+> In short:
+> 
+> 1. [`.bind`][bind] and [`.call`][call]
+>    are very useful and very common in JavaScript codebases.
+> 2. But `.bind` and `.call` are clunky and unergonomic.
+> 
+> [bind]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
+> [call]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
+> 
+> The dynamic `this` binding is a fundamental part of JavaScript design and
+> practice today. Because of this, developers frequently need to change the `this`
+> binding. `.bind` and `.call` are arguably two of the most commonly used
+> functions in all of JavaScript.
+> 
+> We can estimate `.bind` and `.call`’s prevalences using [Node Gzemnid][].
+> Although [Gzemnid can be deceptive][], we are only seeking rough estimations.
+> 
+> [Node Gzemnid]: https://github.com/nodejs/Gzemnid
+> [Gzemnid can be deceptive]: https://github.com/nodejs/Gzemnid/blob/main/README.md#deception
+> 
+> The following results are from the checked-in-Git source code of the top-1000
+> downloaded NPM packages.
+> 
+> | Occurrences | Method      |
+> | ----------: | ----------- |
+> | 1,016,503   |`.map`       |
+> | 315,922     |**`.call`**  |
+> | 271,915     |`console.log`|
+> | 182,292     |`.slice`     |
+> | 170,248     |**`.bind`**  |
+> | 168,872     |`.set`       |
+> | 70,116      |`.push`      |
+> 
+> These results suggest that usage of `.bind` and `.call` are comparable to usage
+> of other frequently used standard functions. In this dataset, their combined
+> usage even exceeds that of `console.log`.
+> 
+> Obviously, [this methodology has many pitfalls][Gzemnid can be deceptive], but
+> we are only looking for roughly estimated orders of magnitude relative to other
+> baseline functions. Gzemnid counts each library’s codebase only once; it does
+> not double-count dependencies.
+> 
+> In fact, this method definitely underestimates the prevalences of `.bind` and
+> `.call` by excluding the large JavaScript codebases of Node and Deno. Node and
+> Deno [copiously use bound functions for security][security-use-case] hundreds or
+> thousands of times.
+> 
+> [security-use-case]: https://github.com/js-choi/proposal-bind-this/blob/main/security-use-case.md
 
 Proposal
 --------
