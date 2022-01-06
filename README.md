@@ -10,7 +10,7 @@
 * [Comparison With Other Proposals](#comparison-with-other-proposals)
 	* [bind-this operator](#bind-this)
 	* [Extension operator](#extensions)
-	* [Partial Function Application](#partial-function-application
+	* [Partial Function Application](#partial-function-application)
 
 Motivation
 ==========
