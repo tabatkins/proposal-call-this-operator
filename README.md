@@ -3,6 +3,15 @@
 * Stage: 0
 * Champions: @tabatkins, @js-choi, others?
 
+---
+
+* [Motivation](#motivation)
+* [Proposal](#proposal)
+* [Comparison With Other Proposals](#comparison-with-other-proposals)
+	* [bind-this operator](#bind-this)
+	* [Extension operator](#extensions)
+	* [Partial Function Application](#partial-function-application
+
 Motivation
 ==========
 
@@ -107,7 +116,7 @@ The [Extensions operator](https://github.com/tc39/proposal-extensions) is essent
 with some more functionality.
 It suffers from identical overlap and issues as bind-this.
 	
-## Partial Function Application
+### Partial Function Application
 
 No direct overlap - PFA creates new functions by binding some of the arguments of an existing function, possibly including the receiver of a method.
 It doesn't directly invoke functions.
