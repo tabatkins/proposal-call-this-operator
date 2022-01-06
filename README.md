@@ -35,7 +35,7 @@ Example usage:
 ```js
 const {slice, map} = Array.prototype;
 const skipFirst = slice::(arrayLike, 1);
-const mapped = map::(arrayLike, 1);
+const mapped = map::(arrayLike, x=>x+1);
 
 const {toString} = Object.prototype;
 const brand = toString::(randomObj);
