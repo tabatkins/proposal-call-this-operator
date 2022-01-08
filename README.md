@@ -11,6 +11,7 @@
 	* [bind-this operator](#bind-this)
 	* [Extension operator](#extensions)
 	* [Partial Function Application](#partial-function-application)
+	* ["Uncurrying"](#uncurrying)
 
 Motivation
 ==========
@@ -183,3 +184,45 @@ PFA does *not* allow one to hard-bind a method against *a different object*,
 like `.bind()` allows,
 but it can easily be defined to work together with the call-this operator to achieve this:
 `meth~@(newReciever, ...)` is now equivalent to `meth.bind(newReceiver)`.
+
+### "Uncurrying"
+
+I don't think this has an official proposal, but it's a legit alternative: a `Function.uncurry(fn)` that is equivalent to `fn.call.bind(fn)`;
+aka it converts a function that uses `this` to instead take its `this` argument as its first argument.
+
+In other words:
+
+```js
+const slice = Function.uncurry(Array.prototype.slice);
+const skipFirst = slice(arrayLike, 1);
+```
+
+Alternately, rather than a built-in function this might be an operator, like:
+
+```js
+const slice = ::Array.prototype.slice;
+const skipFirst = slice(arrayLike, 1);
+```
+
+The benefit of this approach is that it doesn't introduce *any* new calling conventions or syntax. 
+You end up with a perfectly ordinary function that can be called normally,
+passed around to things that expect to pass data as arguments,
+etc.
+It works with PFA and optional-calling *out of the box*,
+without having to do *anything*.
+
+There are two downsides, both relatively minor.
+The first is that this creates additional closures,
+whereas call-this doesn't.
+That's a small but real tax on engines if it becomes very common to do this "on-the-fly".
+Luckily that should be pretty unlikely,
+since the syntax is somewhat annoying--
+you have to wrap the thing in parens,
+like `(::Array.prototype.slice)(arrayLike, 1)`.
+
+The second is that you can't easily apply it to multiple methods extracted from a prototype.
+In the above call-this examples,
+I could use object destructuring to pull multiple methods off of Array,
+and then immediately use them with call-this.
+An uncurry op/func would require you to extract them one-by-one instead,
+so you could feed each one to the operator/function.
