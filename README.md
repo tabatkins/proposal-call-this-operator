@@ -1,4 +1,4 @@
-# "Call-This" Operator (`fn::()` == `fn.call()`) for Javascript
+# "Call-This" Operator (`fn@()` == `fn.call()`) for Javascript
 
 * Stage: 0
 * Champions: @tabatkins, @js-choi, others?
@@ -85,19 +85,19 @@ Taking some text directly from the [bind-this proposal](https://github.com/tc39/
 Proposal
 --------
 
-We add a new calling syntax, the "call-this" operator `fn::(receiver, ...args)`, which invokes fn with the given receiver and arguments, identical to `fn.call(receiver, ...args)`.
+We add a new calling syntax, the "call-this" operator `fn@(receiver, ...args)`, which invokes fn with the given receiver and arguments, identical to `fn.call(receiver, ...args)`.
 
-Precedence is the same as normal function calling; the `::(` is a singular token treated identically to `(` when doing a normal function call. This is the same as the optional-call operator `.?()`, or partial function application `~()`.
+Precedence is the same as normal function calling; the `@(` is a singular token treated identically to `(` when doing a normal function call. This is the same as the optional-call operator `.?()`, or partial function application `~()`.
 
 Example usage:
 
 ```js
 const {slice, map} = Array.prototype;
-const skipFirst = slice::(arrayLike, 1);
-const mapped = map::(arrayLike, x=>x+1);
+const skipFirst = slice@(arrayLike, 1);
+const mapped = map@(arrayLike, x=>x+1);
 
 const {toString} = Object.prototype;
-const brand = toString::(randomObj);
+const brand = toString@(randomObj);
 ```
 
 Comparison With Other Proposals
@@ -105,14 +105,14 @@ Comparison With Other Proposals
 
 ### Bind-This
 
-The call-this operator is very similar to (and occupies roughly the same syntax space as) [the bind-this `::` operator](https://github.com/tc39/proposal-bind-this).
+The call-this operator is very similar to [the bind-this `::` operator](https://github.com/tc39/proposal-bind-this).
 Rather than being based on `.call()`, bind-this is based on `.bind()`; `receiver::fn` is identical to `fn.bind(receiver)`. You can immediately invoke the bound function, as `receiver::fn(args)`, giving the same behavior as call-this, but can do somewhat more as well.
 
 So on the surface, the bind-this operator appears to completely subsume the call-this operator. However, I believe call-this is the better choice, for a few reasons.
 
 1. Parsing/precedence is simpler. The bind-this operator operator has to put restrictions on the RHS of the operator in order to have reasonable and predictable parsing: only dotted ident sequences are allowed, with parens required to do generic operations. For example, if you need to fetch the method out of a map, you can't write `newReceiver::fnmap.get("theMethod")`, because it's unclear whether the author means `fnmap.get("theMethod").bind(newReciever)` or `fnmap.get.bind(newReciever)("theMethod")` (aka a `.call()`). In fact, this sort of expression is still absolutely *valid*, it'll just always be interpreted as the second possibility, possibly being a confusing runtime error.
 
-	On the other hand, `fnmap.get("theMethod")::(newReciever)` is immediately clear and distinct from `fnmap.get::(newReceiver, "theMethod")`, with no chance of confusion. You know precisely what expression is getting invoked to provide the method, and what arguments are being passed to it.
+	On the other hand, `fnmap.get("theMethod")@(newReciever)` is immediately clear and distinct from `fnmap.get@(newReceiver, "theMethod")`, with no chance of confusion. You know precisely what expression is getting invoked to provide the method, and what arguments are being passed to it.
 	
 2. Bind-this overlaps with [partial function application](https://github.com/tc39/proposal-partial-application). PFA makes it extremely easy to hard-bind a method to the object it's currently on - just write `obj.meth~(...)` and you're done, since the reciever is automatically captured by PFA when creating the temporary function. Bind-this can do this too, just more verbosely: `obj::obj.meth`, which is annoying to write and potentially problematic if `obj` is actually a non-trivial expression that now needs to be written and executed twice.
 
@@ -153,7 +153,7 @@ So on the surface, the bind-this operator appears to completely subsume the call
 	
 	Note that call-this does *not* introduce such problems;
 	while a library author *could* still write free functions that rely on a `this` binding being provided,
-	calling it would be done as `zip::(a, b, fn)`,
+	calling it would be done as `zip@(a, b, fn)`,
 	which is identical but slightly less convenient to just writing the function as taking all its arguments normally
 	so it's invokeable as `zip(a, b, fn)`.
 	Thus there's simply no reason for an author to write their library that way,
@@ -182,4 +182,4 @@ On the plus side, the two proposals potentially work together quite well--
 PFA does *not* allow one to hard-bind a method against *a different object*,
 like `.bind()` allows,
 but it can easily be defined to work together with the call-this operator to achieve this:
-`meth::~(newReciever, ...)` is now equivalent to `meth.bind(newReceiver)`.
+`meth~@(newReciever, ...)` is now equivalent to `meth.bind(newReceiver)`.
