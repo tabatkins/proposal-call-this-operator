@@ -107,11 +107,11 @@ Comparison With Other Proposals
 ### Bind-This
 
 The call-this operator is very similar to [the bind-this `::` operator](https://github.com/tc39/proposal-bind-this).
-Rather than being based on `.call()`, bind-this is based on `.bind()`; `receiver::fn` is identical to `fn.bind(receiver)`. You can immediately invoke the bound function, as `receiver::fn(args)`, giving the same behavior as call-this, but can do somewhat more as well.
+Rather than being based on `.call()`, bind-this is based on `.bind()`; `receiver::fn` is identical to `fn.bind(receiver)`. You can immediately invoke the bound function, as `receiver::fn(args)`, giving the same behavior as `fn@(receiver, args)` with call-this, but can do somewhat more as well.
 
 So on the surface, the bind-this operator appears to completely subsume the call-this operator. However, I believe call-this is the better choice, for a few reasons.
 
-1. Parsing/precedence is simpler. The bind-this operator operator has to put restrictions on the RHS of the operator in order to have reasonable and predictable parsing: only dotted ident sequences are allowed, with parens required to do generic operations. For example, if you need to fetch the method out of a map, you can't write `newReceiver::fnmap.get("theMethod")`, because it's unclear whether the author means `fnmap.get("theMethod").bind(newReciever)` or `fnmap.get.bind(newReciever)("theMethod")` (aka a `.call()`). In fact, this sort of expression is still absolutely *valid*, it'll just always be interpreted as the second possibility, possibly being a confusing runtime error.
+1. Parsing/precedence is simpler. The bind-this operator operator has to put restrictions on the RHS of the operator in order to have reasonable and predictable parsing, and allow the immediate-call form: only dotted ident sequences are allowed, with parens required to do generic operations. For example, if you need to fetch the method out of a map, you can't write `newReceiver::fnmap.get("theMethod")`, because it's unclear whether the author means `fnmap.get("theMethod").bind(newReciever)` or `fnmap.get.bind(newReciever)("theMethod")` (aka a `.call()`). In fact, this sort of expression is still absolutely *valid*, it'll just always be interpreted as the second possibility, possibly giving a confusing runtime error.
 
 	On the other hand, `fnmap.get("theMethod")@(newReciever)` is immediately clear and distinct from `fnmap.get@(newReceiver, "theMethod")`, with no chance of confusion. You know precisely what expression is getting invoked to provide the method, and what arguments are being passed to it.
 	
@@ -219,6 +219,8 @@ Luckily that should be pretty unlikely,
 since the syntax is somewhat annoying--
 you have to wrap the thing in parens,
 like `(::Array.prototype.slice)(arrayLike, 1)`.
+That said, this pattern might be recognizable,
+such that engines dont' actually generate the intermediate closure.
 
 The second is that you can't easily apply it to multiple methods extracted from a prototype.
 In the above call-this examples,
